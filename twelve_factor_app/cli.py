@@ -1,12 +1,18 @@
 import os
-import sys
+import pathlib
 
 import click
 
 
 @click.group()
-def cli():
-    pass
+@click.option("-c", "--config-file", "config_file_fp", type=str, default="~/.config/12factor-app/config.ini", help="Configuration file.")
+@click.option("--debug/--no-debug", default=False, help="Enable debug mode.")
+def cli(config_file_fp, debug):
+    config_file = pathlib.Path(config_file_fp).expanduser()
+    if not config_file.exists():
+        raise ValueError(f"Configuration file not found at {str(config_file)}.")
+    os.environ.setdefault("12FACTOR_APP_CONFIG", str(config_file))
+    os.environ.setdefault("12FACTOR_APP_DEBUG", str(debug).upper())
 
 
 @click.command(add_help_option=False, context_settings=dict(ignore_unknown_options=True))
@@ -23,7 +29,6 @@ def django(ctx, management_args):
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-
     execute_from_command_line(argv=[ctx.command_path] + list(management_args))
 
 
@@ -50,7 +55,7 @@ def make_django_command(name, django_command=None, help=None):
 cli.add_command(make_django_command("shell", help="Run a Python interactive interpreter."))
 
 
-@cli.command(add_help_option=False, context_settings=dict(ignore_unknown_options=True))
+@cli.command(add_help_option=False, context_settings=dict(ignore_unknown_options=True), help="Start gunicorn web server.")
 @click.argument("gunicorn_args", nargs=-1, type=click.UNPROCESSED)
 def start_server(gunicorn_args):
     args = ["gunicorn", "twelve_factor_app.wsgi:application"] + list(gunicorn_args)

@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-@5gq8-(arl!ejdi1t(-t=ifj3!x!5b9sc#82dk7i+&j7vt4ltl'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("12FACTOR_APP_DEBUG") == "TRUE"
 
 ALLOWED_HOSTS = []
 
@@ -127,9 +127,11 @@ import logging.config
 
 LOGGING_CONFIG = None
 
-logging.config.fileConfig(BASE_DIR.joinpath('config.ini'))
+logging.config.fileConfig(os.getenv("12FACTOR_APP_CONFIG"))
 app_config = configparser.ConfigParser()
 
-app_config.read(BASE_DIR.joinpath('config.ini'))
+app_config.read(os.getenv("12FACTOR_APP_CONFIG"))
 
 WAIT_SECS = float(app_config['default']['wait_secs'])
+
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
