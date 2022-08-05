@@ -5,7 +5,14 @@ import click
 
 
 @click.group()
-@click.option("-c", "--config-file", "config_file_fp", type=str, default="~/.config/12factor-app/config.ini", help="Configuration file.")
+@click.option(
+    "-c",
+    "--config-file",
+    "config_file_fp",
+    type=str,
+    default="~/.config/12factor-app/config.ini",
+    help="Configuration file.",
+)
 @click.option("--debug/--no-debug", default=False, help="Enable debug mode.")
 def cli(config_file_fp, debug):
     config_file = pathlib.Path(config_file_fp).expanduser()
@@ -15,12 +22,14 @@ def cli(config_file_fp, debug):
     os.environ.setdefault("12FACTOR_APP_DEBUG", str(debug).upper())
 
 
-@click.command(add_help_option=False, context_settings=dict(ignore_unknown_options=True))
+@click.command(
+    add_help_option=False, context_settings=dict(ignore_unknown_options=True)
+)
 @click.argument("management_args", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
 def django(ctx, management_args):
     "Execute Django subcommands."
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'twelve_factor_app.settings')
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "twelve_factor_app.settings")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
@@ -52,10 +61,16 @@ def make_django_command(name, django_command=None, help=None):
     return inner
 
 
-cli.add_command(make_django_command("shell", help="Run a Python interactive interpreter."))
+cli.add_command(
+    make_django_command("shell", help="Run a Python interactive interpreter.")
+)
 
 
-@cli.command(add_help_option=False, context_settings=dict(ignore_unknown_options=True), help="Start gunicorn web server.")
+@cli.command(
+    add_help_option=False,
+    context_settings=dict(ignore_unknown_options=True),
+    help="Start gunicorn web server.",
+)
 @click.argument("gunicorn_args", nargs=-1, type=click.UNPROCESSED)
 def start_server(gunicorn_args):
     args = ["gunicorn", "twelve_factor_app.wsgi:application"] + list(gunicorn_args)

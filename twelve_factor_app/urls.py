@@ -19,7 +19,7 @@ from django.urls import path
 from .views import waiting_view, error_view
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('wait-me/', view=waiting_view),
-    path('error/', view=error_view),
+    path("admin/", admin.site.urls),
+    path("wait-me/", view=waiting_view),
+    path("error/", view=error_view),
 ]

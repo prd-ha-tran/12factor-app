@@ -5,8 +5,8 @@ from django.http import HttpRequest, HttpResponse
 
 
 def waiting_view(request: HttpRequest):
-    if 'for' in request.GET:
-        secs = int(request.GET['for'])
+    if "for" in request.GET:
+        secs = int(request.GET["for"])
     else:
         secs = settings.WAIT_SECS
     time.sleep(secs)
