@@ -1,15 +1,15 @@
 12-factor app
 ---
 
-#i. Requirements
+# i. Requirements
 
 - Python >=3.8
 
-#ii. Install
+# ii. Install
 
 Running pip install with the package on the github releases page.
 
-#iii. Run
+# iii. Run
 
 ```
 twelve-factor-app --help
@@ -25,7 +25,7 @@ Commands:
   start-server  Start gunicorn web server.
 ```
 
-##0. Configurations
+## 0. Configurations
 
 Configuration file default path to `$XDG_CONFIG_DIR/12-app-factor`
 or  you can specific with `-c/--config-file` option.
@@ -57,7 +57,7 @@ Type: comma separated string
 
 The domain of the web interface of the app pointed to.
 
-###Logging
+### Logging
 
 Followed to python's logging configuration file format
 
