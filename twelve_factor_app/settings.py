@@ -130,11 +130,42 @@ import logging.config
 
 LOGGING_CONFIG = None
 
-logging.config.fileConfig(os.getenv("12FACTOR_APP_CONFIG"))
 app_config = configparser.ConfigParser()
 
 app_config.read(os.getenv("12FACTOR_APP_CONFIG"))
 
+
+def config_logging(app_config):
+    if "keys" in app_config["loggers"]:
+        loggers_keys = app_config["loggers"]["keys"]
+    else:
+        loggers_keys = ""
+    if "root" not in loggers_keys:
+        app_config.set(
+            "loggers", "keys", loggers_keys + ",root" if loggers_keys != "" else "root"
+        )
+        app_config.add_section("logger_root")
+        app_config["logger_root"]["handlers"] = ""
+        app_config["logger_root"]["level"] = "WARNING"
+    if "formatters" not in app_config:
+        app_config.add_section("formatters")
+        app_config["formatters"]["keys"] = ""
+    if "handlers" not in app_config:
+        app_config.add_section("handlers")
+        app_config["handlers"]["keys"] = ""
+
+
+try:
+    config_logging(app_config)
+except KeyError:
+    app_config.add_section("loggers")
+    config_logging(app_config)
+
+logging.config.fileConfig(app_config)
+
 WAIT_SECS = float(app_config["default"]["wait_secs"])
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS.extend(
+    [host.strip() for host in app_config["default"]["allow_hosts"].split(",")]
+)
