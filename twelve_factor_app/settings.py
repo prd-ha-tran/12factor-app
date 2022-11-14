@@ -25,9 +25,6 @@ SECRET_KEY = "django-insecure-@5gq8-(arl!ejdi1t(-t=ifj3!x!5b9sc#82dk7i+&j7vt4ltl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("12FACTOR_APP_DEBUG") == "TRUE"
 
-ALLOWED_HOSTS = []
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -132,7 +129,7 @@ LOGGING_CONFIG = None
 
 app_config = configparser.ConfigParser()
 
-app_config.read(os.getenv("12FACTOR_APP_CONFIG"))
+app_config.read(os.environ["12FACTOR_APP_CONFIG"])
 
 
 def config_logging(app_config):
@@ -145,7 +142,7 @@ def config_logging(app_config):
             "loggers", "keys", loggers_keys + ",root" if loggers_keys != "" else "root"
         )
         app_config.add_section("logger_root")
-        app_config["logger_root"]["handlers"] = ""
+        app_config["logger_root"]["handlers"] = "consoleHandler"
         app_config["logger_root"]["level"] = "WARNING"
     if "formatters" not in app_config:
         app_config.add_section("formatters")
@@ -167,5 +164,5 @@ WAIT_SECS = float(app_config["default"]["wait_secs"])
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 ALLOWED_HOSTS.extend(
-    [host.strip() for host in app_config["default"]["allow_hosts"].split(",")]
+    [host.strip() for host in app_config["default"].get("allowed_hosts", "").split(",") if host.strip()]
 )
