@@ -31,7 +31,7 @@ SECRET_KEY = "django-insecure-@5gq8-(arl!ejdi1t(-t=ifj3!x!5b9sc#82dk7i+&j7vt4ltl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("12FACTOR_APP_DEBUG") == "TRUE"
 
-DISABLE_WHITENOSE = app_config["default"].get("disable_whitenose") == 1
+DISABLE_WHITENOSE = app_config["default"].get("disable_whitenose") == "1"
 
 # Application definition
 
