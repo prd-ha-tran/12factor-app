@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.conf import settings
 from django.urls import path
 
 from .views import waiting_view, error_view
@@ -23,3 +24,9 @@ urlpatterns = [
     path("wait-me/", view=waiting_view),
     path("error/", view=error_view),
 ]
+
+if settings.DISABLE_WHITENOSE:
+    from django.conf.urls.static import static
+    from django.contrib.staticfiles.views import serve as serve_staticfiles
+
+    urlpatterns += static(settings.STATIC_URL, view=serve_staticfiles)

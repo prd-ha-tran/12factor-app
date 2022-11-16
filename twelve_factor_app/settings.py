@@ -9,8 +9,14 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+import configparser
+import logging.config
 import os
 from pathlib import Path
+
+app_config = configparser.ConfigParser()
+
+app_config.read(os.environ["12FACTOR_APP_CONFIG"])
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
@@ -25,6 +31,8 @@ SECRET_KEY = "django-insecure-@5gq8-(arl!ejdi1t(-t=ifj3!x!5b9sc#82dk7i+&j7vt4ltl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("12FACTOR_APP_DEBUG") == "TRUE"
 
+DISABLE_WHITENOSE = app_config["default"].get("disable_whitenose") == 1
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -36,9 +44,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 ]
 
+_whitenose_middleware = [] if DISABLE_WHITENOSE else ["whitenoise.middleware.WhiteNoiseMiddleware"]
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    *_whitenose_middleware,
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -114,22 +124,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = "assets/"
-STATIC_ROOT = BASE_DIR / "assets"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+if not DISABLE_WHITENOSE:
+    STATIC_ROOT = BASE_DIR / "assets"
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-import configparser
-import logging.config
-
 LOGGING_CONFIG = None
-
-app_config = configparser.ConfigParser()
-
-app_config.read(os.environ["12FACTOR_APP_CONFIG"])
 
 
 def config_logging(app_config):
