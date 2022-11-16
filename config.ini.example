@@ -2,37 +2,49 @@
 wait_secs = 5
 
 [loggers]
-keys=root,django.request,gunicorn.access
+keys=django.request,gunicorn.access,gunicorn.error,twelve_factor_app
 
 [handlers]
 keys=consoleHandler
 
 [formatters]
-keys=sampleFormatter
+keys=generic
 
-[logger_root]
+[logger_twelve_factor_app]
 level=DEBUG
 handlers=consoleHandler
+qualname=twelve_factor_app
 
 [logger_django.request]
 level=DEBUG
 handlers=consoleHandler
 qualname=django.request
-propagate=0
 
 [logger_gunicorn.access]
 level=DEBUG
 handlers=consoleHandler
 qualname=gunicorn.access
-propagate=0
+
+[logger_gunicorn.error]
+level=DEBUG
+handlers=consoleHandler
+qualname=gunicorn.error
 
 [handler_consoleHandler]
 class=StreamHandler
 level=DEBUG
-formatter=sampleFormatter
+formatter=generic
 stream=ext://sys.stdout
 
-[formatter_sampleFormatter]
+[handler_errorConsoleHandler]
+class=StreamHandler
+level=DEBUG
+formatter=generic
+stream=ext://sys.stderr
+
+[formatter_generic]
 format=%(asctime)s [%(process)d] [%(levelname)s] %(message)s
 datefmt=[%Y-%m-%d %H:%M:%S %z]
 class=logging.Formatter
+
+[gunicorn]

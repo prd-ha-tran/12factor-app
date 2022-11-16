@@ -142,7 +142,7 @@ def config_logging(app_config):
             "loggers", "keys", loggers_keys + ",root" if loggers_keys != "" else "root"
         )
         app_config.add_section("logger_root")
-        app_config["logger_root"]["handlers"] = "consoleHandler"
+        app_config["logger_root"]["handlers"] = ""
         app_config["logger_root"]["level"] = "WARNING"
     if "formatters" not in app_config:
         app_config.add_section("formatters")
@@ -159,6 +159,13 @@ except KeyError:
     config_logging(app_config)
 
 logging.config.fileConfig(app_config)
+
+
+GUNICORN_CONFIGS = {
+    **dict(app_config["gunicorn"]),
+    "logger_class": "twelve_factor_app.gunicorn.logger.GLogger",
+    "accesslog": "-",
+}
 
 WAIT_SECS = float(app_config["default"]["wait_secs"])
 

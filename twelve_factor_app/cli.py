@@ -32,6 +32,9 @@ class Command(click.Command):
 
         debug = ctx.params["debug"]
         os.environ.setdefault("12FACTOR_APP_DEBUG", str(debug).upper())
+
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "twelve_factor_app.settings")
+
         return ctx
 
 
@@ -99,11 +102,9 @@ cli.add_command(
 )
 @click.argument("gunicorn_args", nargs=-1, type=click.UNPROCESSED)
 def start_server(gunicorn_args, **options):
-    gunicorn_accesslog_fmt = '%(h)s %(l)s %(u)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
     args = [
         "gunicorn",
         "twelve_factor_app.wsgi:application",
-        "--access-logfile", "-",
-        "--access-logformat", gunicorn_accesslog_fmt,
+        "-c", "python:twelve_factor_app.gunicorn.conf",
     ] + list(gunicorn_args)
     os.execvp(args[0], args)
